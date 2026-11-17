@@ -532,18 +532,28 @@ var DELIVER = {
     var dest = DELIVER[form === forms.request ? 'request' : 'partner'];
     if (dest.cc && dest.cc.length) data._cc = dest.cc.join(',');
 
+    // fallback: the same answers as a ready-to-send email, to every recipient
+    var lines = Object.keys(data).filter(function (k) { return k.charAt(0) !== '_'; })
+      .map(function (k) { return k.replace(/_/g, ' ') + ': ' + data[k]; });
+    var mailHref = 'mailto:' + [dest.to].concat(dest.cc || []).join(',') +
+      '?subject=' + encodeURIComponent(data._subject) + '&body=' + encodeURIComponent(lines.join('\n'));
+
     btn.disabled = true; btn.textContent = 'sending…'; status.textContent = '';
+    var ctrl = window.AbortController ? new AbortController() : null;
+    var timer = setTimeout(function () { if (ctrl) ctrl.abort(); }, 15000);
     fetch('https://formsubmit.co/ajax/' + dest.to, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-      body: JSON.stringify(data)
-    }).then(function (r) { return r.json(); }).then(function (res) {
+      body: JSON.stringify(data),
+      signal: ctrl ? ctrl.signal : undefined
+    }).then(function (r) { clearTimeout(timer); return r.json(); }).then(function (res) {
       if (String(res.success) !== 'true') throw new Error(res.message || 'failed');
       form.classList.add('done');
       form.innerHTML = '<h2>' + (form === forms.request ? 'received.' : 'thank you.') + '</h2><p class="foot big">we\'ll be in touch. more to come.</p>';
     }).catch(function () {
+      clearTimeout(timer);
       btn.disabled = false; btn.textContent = form === forms.request ? 'request a seat' : 'send';
-      status.innerHTML = 'something went wrong. try again, or email <a href="mailto:' + EMAIL + '">' + EMAIL + '</a>.';
+      status.innerHTML = 'that didn\'t go through. <a href="' + mailHref + '">send it by email instead</a>, your answers are already filled in.';
     });
   }
   Object.keys(forms).forEach(function (k) {
