@@ -150,6 +150,7 @@
   #info.open .info-inner > :nth-child(3) { transition-delay: .75s; }
   #info.open .info-inner > :nth-child(4) { transition-delay: .9s; }
   #info.open .info-inner > :nth-child(5) { transition-delay: 1.05s; }
+  #info.open .info-inner > :nth-child(6) { transition-delay: 1.2s; }
   .lede {
     font-size: clamp(26px, 3.6vw, 52px); line-height: 1.12; letter-spacing: -0.035em;
     max-width: 19em; margin: 0;
@@ -230,6 +231,23 @@
   .xform .foot.big { font-size: clamp(20px, 2.4vw, 28px); opacity: .85; margin-top: 0; }
   .xform.done { min-height: 70vh; display: flex; flex-direction: column; justify-content: center; }
 
+  /* what to expect */
+  .expect-link {
+    display: inline-block; margin-top: 18px; color: #fff; text-decoration: none;
+    font-size: clamp(15px, 1.45vw, 20px); letter-spacing: -0.01em;
+    border-bottom: 2px solid rgba(255,255,255,.4); padding-bottom: 2px;
+    transition: border-color .2s ease;
+  }
+  .expect-link:hover, .expect-link:focus-visible { border-bottom-color: #fff; outline: none; }
+  .expect-link span { display: inline-block; transition: transform .25s var(--ease-out); }
+  .expect-link:hover span { transform: translateX(4px); }
+  .expect section { margin: 0 0 30px; }
+  .expect h3 { margin: 0 0 6px; font-size: 14px; color: rgba(255,255,255,.62); letter-spacing: -0.005em; font-weight: 700; }
+  .expect h3 .xmark { height: 1.5em; vertical-align: -.5em; margin-left: .1em; color: #fff; }
+  .expect section p { margin: 0; font-size: clamp(19px, 2vw, 23px); line-height: 1.35; letter-spacing: -0.015em; }
+  .expect .submit { display: inline-block; margin-top: 18px; text-decoration: none; }
+  .expect .foot a { color: #fff; }
+
   @media (max-width: 600px) {
     .btn { width: 100%; max-width: 340px; text-align: center; }
     #stage { padding-top: 64px; }
@@ -276,6 +294,7 @@
     <p class="lede">The X Table is a recurring dinner series where high-signal founders and creators exchange lived intelligence.</p>
     <p class="lede">Every edition solves for a different<svg class="xmark" viewBox="120 200 615 410" role="img" aria-label="X"><path d="M152 505 C138 498 136 488 146 476 C210 400 300 315 385 250 C410 230 440 218 452 240 C462 262 440 310 410 390 C395 430 375 470 362 500 C356 518 368 524 392 522 L578 512"/><path d="M226 592 C330 500 450 410 560 335 C620 295 670 265 715 240"/></svg>.</p>
     <p class="seating"><b>next seating:</b>December 4th, Miami FL, Art Basel, 6pm</p>
+    <a class="expect-link" href="#expect" data-form="expect">what to expect <span aria-hidden="true">&rarr;</span></a>
     <div class="ctas">
       <a class="btn" href="#request" data-form="request">Request Ticket</a>
       <a class="btn" href="#partner" data-form="partner">Partnerships &amp; Sponsor Request</a>
@@ -287,6 +306,20 @@
 <!-- forms -->
 <section id="sheet" aria-hidden="true" role="dialog" aria-modal="true">
   <button class="sheet-close" type="button" aria-label="Close">&times;</button>
+
+  <div class="xform expect" id="panel-expect">
+    <h2>what to expect</h2>
+    <section><h3>the table</h3><p>twenty seats. founders, creators, collectors. people you haven't met yet, on purpose.</p></section>
+    <section><h3>the art</h3><p>illusion. perception. assumption. the things we get wrong about each other, until we sit down.</p></section>
+    <section><h3>the artist</h3><p>tonight, you're the chef. you'll build part of your dinner. the chef takes it from there.</p></section>
+    <section><h3>your <svg class="xmark" viewBox="120 200 615 410" role="img" aria-label="X"><path d="M152 505 C138 498 136 488 146 476 C210 400 300 315 385 250 C410 230 440 218 452 240 C462 262 440 310 410 390 C395 430 375 470 362 500 C356 518 368 524 392 522 L578 512"/><path d="M226 592 C330 500 450 410 560 335 C620 295 670 265 715 240"/></svg></h3><p>come with three things: where you started, where you're headed, and something you know that others don't.</p></section>
+    <section><h3>the canvas</h3><p>everyone makes something. by the end of the night, the table has made one piece together.</p></section>
+    <section><h3>the rules</h3><p>phones down at the table. take the pics, live the moment, post later.<br>transmission over transaction. no pitching.<br>be curious, not impressive.</p></section>
+    <section><h3>the details</h3><p>12.04. miami. address shared once you're confirmed. 6pm.<br>$185 early bird pricing<br>dress: all black.</p></section>
+    <section><h3>allergies</h3><p>tell us. we'll take care of you.</p></section>
+    <a class="btn submit" href="#request" data-form="request">request a seat</a>
+    <p class="foot">any questions? contact <a href="mailto:skyler@holyduck.agency">skyler@holyduck.agency</a></p>
+  </div>
 
   <form class="xform" id="form-request" data-subject="Seat request: The X Table, Basel, 12.04" novalidate>
     <h2>request a seat: the x table, basel. 12.04, miami.</h2>
@@ -459,20 +492,20 @@ var NOTIFY = ['skyler@holyduck.agency', 'lucy@thebasic-group.com'];
   /* ---- forms ---- */
   var sheet = document.getElementById('sheet');
   var forms = { request: document.getElementById('form-request'), partner: document.getElementById('form-partner') };
+  var panels = { expect: document.getElementById('panel-expect'), request: forms.request, partner: forms.partner };
   var current = null;
 
   function openForm(name, push) {
-    if (!forms[name]) return;
+    if (!panels[name]) return;
     if (!info.classList.contains('open')) openInfo(null, false);
     current = name;
-    forms.request.hidden = name !== 'request';
-    forms.partner.hidden = name !== 'partner';
+    Object.keys(panels).forEach(function (k) { panels[k].hidden = k !== name; });
     sheet.scrollTop = 0;
     sheet.classList.add('open');
     sheet.removeAttribute('aria-hidden');
     info.setAttribute('aria-hidden', 'true');
     if (push !== false) history.pushState({ form: name }, '', '#' + name);
-    setTimeout(function () { var f = forms[name].querySelector('input'); if (f && window.innerWidth > 700) f.focus({ preventScroll: true }); }, 450);
+    setTimeout(function () { var f = panels[name].querySelector('input'); if (f && window.innerWidth > 700) f.focus({ preventScroll: true }); }, 450);
   }
   function closeForm(push) {
     if (!current) return;
@@ -562,13 +595,13 @@ var NOTIFY = ['skyler@holyduck.agency', 'lucy@thebasic-group.com'];
   });
   function route() {
     var h = location.hash.slice(1);
-    if (forms[h]) openForm(h, false);
+    if (panels[h]) openForm(h, false);
     else if (h === 'seat') { closeForm(false); if (!info.classList.contains('open')) openInfo(null, false); }
     else { closeForm(false); closeInfo(false); }
   }
   window.addEventListener('popstate', route);
   var h0 = location.hash.slice(1);
-  if (h0 === 'seat' || forms[h0]) { finishIntro(); route(); }
+  if (h0 === 'seat' || panels[h0]) { finishIntro(); route(); }
 })();
 
 /* ===== hand-drawn table sketch (draws, holds, erases, redraws) ===== */
