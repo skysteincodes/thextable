@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The X Table</title>
+<meta name="description" content="The X Table is a recurring dinner series where high-signal founders and creators exchange lived intelligence.">
+<meta property="og:title" content="The X Table">
+<meta property="og:description" content="What do you bring to the table?">
+<meta name="theme-color" content="#f6f4ef">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 836 836'%3E%3Ccircle cx='418' cy='418' r='418' fill='%23000'/%3E%3Cg fill='none' stroke='%23fff' stroke-width='30' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M152 505 C138 498 136 488 146 476 C210 400 300 315 385 250 C410 230 440 218 452 240 C462 262 440 310 410 390 C395 430 375 470 362 500 C356 518 368 524 392 522 L578 512'/%3E%3Cpath d='M226 592 C330 500 450 410 560 335 C620 295 670 265 715 240'/%3E%3C/g%3E%3C/svg%3E">
+<style>
+  :root {
+    --paper: #f6f4ef;
+    --ink: #151515;
+    --font: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    --ease: cubic-bezier(.77, 0, .175, 1);
+    --ease-out: cubic-bezier(.16, 1, .3, 1);
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    color-scheme: light;
+    font-family: var(--font);
+    font-weight: 700;
+    overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+  button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+
+  /* ---------- the X mark ---------- */
+  .xmark { display: inline-block; overflow: visible; }
+  .xmark path { fill: none; stroke: currentColor; stroke-width: 28; stroke-linecap: round; stroke-linejoin: round; }
+
+  /* ---------- logo (intro → focus → corner) ---------- */
+  #logo {
+    position: fixed; left: 0; top: 0; z-index: 30;
+    font-size: 100px; line-height: 1; letter-spacing: -0.045em;
+    white-space: nowrap; transform-origin: 0 0;
+    display: flex; align-items: center; gap: .14em;
+    padding: .3em 0;               /* room for the X to overhang */
+    color: var(--ink);
+    transition: color .6s ease;
+    will-change: transform;
+    cursor: default;
+  }
+  #logo.is-link { cursor: pointer; }
+  #logo .w { display: inline-block; overflow: hidden; padding: .06em .02em .12em; margin: -.06em -.02em -.12em; transition: opacity .45s ease; }
+  #logo .w > span { display: inline-block; transform: translateY(115%); transition: transform 1s var(--ease-out); }
+  #logo.in .w > span { transform: none; }
+  #logo .w:nth-of-type(2) > span { transition-delay: .12s; }
+  #logo.focus .w { opacity: 0; }
+  #logo .xmark { height: 1.42em; margin: -.14em 0 -.28em; position: relative; top: .1em; }
+  #logo .xmark path { stroke-dasharray: 1 2; stroke-dashoffset: 1.01; }
+  #logo .xmark path:nth-child(1) { transition: stroke-dashoffset .95s cubic-bezier(.55,.05,.35,1) .35s; }
+  #logo .xmark path:nth-child(2) { transition: stroke-dashoffset .5s cubic-bezier(.55,.05,.35,1) 1.25s; }
+  #logo.in .xmark path { stroke-dashoffset: 0; }
+  #logo.dark { color: #fff; }
+
+  /* ---------- table stage ---------- */
+  #stage {
+    position: fixed; inset: 0;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 72px 16px 24px;
+    opacity: 0; pointer-events: none;
+    transition: opacity .8s ease;
+  }
+  #stage.on { opacity: 1; pointer-events: auto; }
+  #ask {
+    position: relative; z-index: 2;
+    font-size: clamp(30px, 5.6vw, 76px); line-height: 1.02; letter-spacing: -0.04em;
+    text-align: center; max-width: 16em;
+    margin-bottom: calc(-1 * clamp(4px, 2vw, 30px));
+    transform: translateY(18px); opacity: 0;
+    transition: transform 1.1s var(--ease-out) .5s, opacity 1s ease .5s;
+  }
+  #stage.on #ask { transform: none; opacity: 1; }
+  #ask span { background-image: linear-gradient(currentColor, currentColor); background-size: 0% .07em; background-repeat: no-repeat; background-position: 0 92%; transition: background-size .5s var(--ease); }
+  #ask:hover span, #ask:focus-visible span { background-size: 100% .07em; }
+  #ask:focus-visible { outline: none; }
+  #sketch { display: block; width: min(94vw, 1180px); height: auto; max-height: 64vh; }
+
+  /* ---------- dark info page ---------- */
+  #info {
+    position: fixed; inset: 0; z-index: 20;
+    background: #000; color: #fff;
+    overflow-y: auto; -webkit-overflow-scrolling: touch;
+    clip-path: circle(0px at var(--cx, 50%) var(--cy, 50%));
+    visibility: hidden;
+    transition: clip-path 1.05s var(--ease), visibility 0s linear 1.05s;
+  }
+  #info.open { clip-path: circle(150vmax at var(--cx, 50%) var(--cy, 50%)); visibility: visible; transition: clip-path 1.05s var(--ease), visibility 0s; }
+  .info-inner {
+    min-height: 100%;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 110px 16px 48px; text-align: center;
+  }
+  .info-inner > * { opacity: 0; transform: translateY(16px); transition: opacity .7s ease, transform .9s var(--ease-out); }
+  #info.open .info-inner > * { opacity: 1; transform: none; }
+  #info.open .info-inner > :nth-child(1) { transition-delay: .45s; }
+  #info.open .info-inner > :nth-child(2) { transition-delay: .6s; }
+  #info.open .info-inner > :nth-child(3) { transition-delay: .75s; }
+  #info.open .info-inner > :nth-child(4) { transition-delay: .9s; }
+  #info.open .info-inner > :nth-child(5) { transition-delay: 1.05s; }
+  .lede {
+    font-size: clamp(26px, 3.6vw, 52px); line-height: 1.12; letter-spacing: -0.035em;
+    max-width: 19em; margin: 0;
+  }
+  .lede + .lede { margin-top: 1em; }
+  .lede .xmark { height: 1.15em; vertical-align: -.32em; margin: 0 .04em 0 .1em; }
+  .seating {
+    margin: 2.6em 0 0; font-size: clamp(15px, 1.45vw, 20px); letter-spacing: -0.01em;
+    opacity: .9;
+  }
+  .seating b { font-weight: 700; opacity: .55; margin-right: .5em; }
+  .ctas { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin-top: 28px; }
+  .btn {
+    display: inline-block; text-decoration: none; color: #fff;
+    border: 2px solid #fff; border-radius: 999px;
+    padding: 15px 28px; font-size: clamp(15px, 1.3vw, 18px); letter-spacing: -0.01em;
+    transition: background .25s ease, color .25s ease;
+  }
+  .btn:hover, .btn:focus-visible { background: #fff; color: #000; outline: none; }
+  .sign {
+    margin-top: 72px; font-size: clamp(14px, 1.2vw, 17px); letter-spacing: .02em; opacity: .7;
+  }
+
+  @media (max-width: 600px) {
+    .btn { width: 100%; max-width: 340px; text-align: center; }
+    #stage { padding-top: 64px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { transition-duration: .01s !important; transition-delay: 0s !important; }
+  }
+</style>
+</head>
+<body>
+
+<!-- logo: one element that animates through all three phases -->
+<div id="logo" role="img" aria-label="the X table">
+  <span class="w"><span>the</span></span>
+  <svg class="xmark" viewBox="120 200 615 410" aria-hidden="true">
+    <path pathLength="1" d="M152 505 C138 498 136 488 146 476 C210 400 300 315 385 250 C410 230 440 218 452 240 C462 262 440 310 410 390 C395 430 375 470 362 500 C356 518 368 524 392 522 L578 512"/>
+    <path pathLength="1" d="M226 592 C330 500 450 410 560 335 C620 295 670 265 715 240"/>
+  </svg>
+  <span class="w"><span>table</span></span>
+</div>
+
+<!-- table sketch + question -->
+<main id="stage" aria-hidden="true">
+  <button id="ask" type="button"><span>what do you bring to the table?</span></button>
+  <svg id="sketch" viewBox="-90 120 1390 740" role="img" aria-label="A minimal mid-century modern table drawn by hand in black ink">
+    <defs>
+      <filter id="boil" filterUnits="userSpaceOnUse" x="-90" y="120" width="1390" height="740">
+        <feTurbulence id="noise" type="fractalNoise" baseFrequency="0.022" numOctaves="2" seed="3" result="n"/>
+        <feDisplacementMap in="SourceGraphic" in2="n" scale="2.4" xChannelSelector="R" yChannelSelector="G"/>
+      </filter>
+    </defs>
+    <g id="shadow" fill="none" stroke="#151515" stroke-linecap="round"></g>
+    <g id="ink" filter="url(#boil)" fill="none" stroke="#151515" stroke-linecap="round" stroke-linejoin="round">
+      <g id="hatch"></g>
+      <g id="main"></g>
+    </g>
+  </svg>
+</main>
+
+<!-- dark page -->
+<section id="info" aria-hidden="true">
+  <div class="info-inner">
+    <p class="lede">The X Table is a recurring dinner series where high-signal founders and creators exchange lived intelligence.</p>
+    <p class="lede">Every edition solves for a different<svg class="xmark" viewBox="120 200 615 410" role="img" aria-label="X"><path d="M152 505 C138 498 136 488 146 476 C210 400 300 315 385 250 C410 230 440 218 452 240 C462 262 440 310 410 390 C395 430 375 470 362 500 C356 518 368 524 392 522 L578 512"/><path d="M226 592 C330 500 450 410 560 335 C620 295 670 265 715 240"/></svg>.</p>
+    <p class="seating"><b>next seating:</b>December 4th, Miami FL, Art Basel, 6pm</p>
+    <div class="ctas">
+      <a class="btn" id="ticket" href="#">Request Ticket</a>
+      <a class="btn" id="partner" href="#">Partnerships &amp; Sponsor Request</a>
+    </div>
+    <div class="sign">[ Transmission &gt; Transaction ]</div>
+  </div>
+</section>
+
+<script>
+/* ===== edit these ===== */
+var EMAIL = 'skyler@holyduck.agency';
+var MAIL = {
+  ticket:  { subject: 'Ticket Request: The X Table, Miami, Dec 4', body: 'Name:\nCompany / project:\nWhat I bring to the table:\n' },
+  partner: { subject: 'Partnership & Sponsorship: The X Table', body: 'Name:\nCompany:\nWhat we have in mind:\n' }
+};
+/* ====================== */
+
+(function () {
+  function mailto(o) { return 'mailto:' + EMAIL + '?subject=' + encodeURIComponent(o.subject) + '&body=' + encodeURIComponent(o.body); }
+  document.getElementById('ticket').href = mailto(MAIL.ticket);
+  document.getElementById('partner').href = mailto(MAIL.partner);
+
+  var logo = document.getElementById('logo');
+  var xm = logo.querySelector('.xmark');
+  var stage = document.getElementById('stage');
+  var ask = document.getElementById('ask');
+  var info = document.getElementById('info');
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  var phase = 'intro', timers = [];
+
+  /* layout target for each phase: translate(x,y) scale(s), origin top-left */
+  function target(p) {
+    var vw = window.innerWidth, vh = window.innerHeight;
+    var w = logo.offsetWidth, h = logo.offsetHeight;
+    var lr = logo.getBoundingClientRect(), xr = xm.getBoundingClientRect();
+    var cur = lr.width / w || 1;                 // current scale
+    var xcx = (xr.left - lr.left + xr.width / 2) / cur;
+    var xcy = (xr.top - lr.top + xr.height / 2) / cur;
+    var xw = xr.width / cur;
+    var pad = Math.max(16, vw * 0.03), s;
+    if (p === 'intro') {
+      s = Math.min((vw * 0.86) / w, (vh * 0.42) / h);
+      var over = Math.max(0, (xr.bottom - lr.bottom) / cur); // X tail hangs below the box
+      return [vw - w * s - pad * 0.6, vh - (h + over) * s - pad * 0.6, s];
+    }
+    if (p === 'focus') {
+      s = Math.min(vw * 0.62, vh * 0.85) / xw;
+      return [vw / 2 - xcx * s, vh / 2 - xcy * s, s];
+    }
+    s = (vw < 600 ? 24 : 30) / 100;             // corner: ~30px type
+    return [pad * 0.8 - 2, pad * 0.5 - h * s * 0.12, s];
+  }
+  function place(p, ms, easing) {
+    var t = target(p);
+    logo.style.transition = ms ? 'transform ' + ms + 'ms ' + (easing || 'var(--ease)') + ', color .6s ease' : 'color .6s ease';
+    logo.style.transform = 'translate(' + t[0].toFixed(1) + 'px,' + t[1].toFixed(1) + 'px) scale(' + t[2].toFixed(4) + ')';
+  }
+  function later(fn, ms) { timers.push(setTimeout(fn, ms)); }
+
+  function finishIntro() {
+    timers.forEach(clearTimeout); timers = [];
+    logo.classList.add('in');
+    logo.classList.remove('focus');
+    phase = 'corner';
+    place('corner', 0);
+    logo.classList.add('is-link');
+    showStage();
+  }
+  function showStage() {
+    stage.classList.add('on');
+    stage.removeAttribute('aria-hidden');
+    if (window.startSketch) window.startSketch();
+  }
+
+  /* ---- intro sequence ---- */
+  place('intro', 0);
+  if (reduce) {
+    finishIntro();
+  } else {
+    requestAnimationFrame(function () {
+      requestAnimationFrame(function () { logo.classList.add('in'); });
+    });
+    later(function () {                         // zoom into the X
+      phase = 'focus';
+      logo.classList.add('focus');
+      place('focus', 1300);
+    }, 2200);
+    later(function () {                         // settle in the top-left
+      phase = 'corner';
+      place('corner', 1100);
+      later(function () { logo.classList.remove('focus'); }, 550);
+    }, 4100);
+    later(function () { logo.classList.add('is-link'); showStage(); }, 4900);
+    // tap / key to skip the intro
+    function skip() { if (phase !== 'corner') finishIntro(); window.removeEventListener('pointerdown', skip); window.removeEventListener('keydown', skip); }
+    window.addEventListener('pointerdown', skip);
+    window.addEventListener('keydown', skip);
+  }
+
+  window.addEventListener('resize', function () { place(phase, 0); });
+
+  /* ---- dark page ---- */
+  function openInfo(e, push) {
+    var x = e && e.clientX ? e.clientX : window.innerWidth / 2;
+    var y = e && e.clientY ? e.clientY : window.innerHeight / 2;
+    info.style.setProperty('--cx', x + 'px');
+    info.style.setProperty('--cy', y + 'px');
+    info.classList.add('open');
+    info.removeAttribute('aria-hidden');
+    stage.setAttribute('aria-hidden', 'true');
+    logo.classList.add('dark');
+    document.querySelector('meta[name=theme-color]').content = '#000000';
+    if (push !== false) history.pushState({ info: 1 }, '', '#seat');
+  }
+  function closeInfo(push) {
+    info.classList.remove('open');
+    info.setAttribute('aria-hidden', 'true');
+    stage.removeAttribute('aria-hidden');
+    logo.classList.remove('dark');
+    document.querySelector('meta[name=theme-color]').content = '#f6f4ef';
+    if (push !== false && location.hash === '#seat') history.back();
+  }
+  ask.addEventListener('click', function (e) { openInfo(e); });
+  logo.addEventListener('click', function () { if (info.classList.contains('open')) closeInfo(); });
+  window.addEventListener('keydown', function (e) { if (e.key === 'Escape' && info.classList.contains('open')) closeInfo(); });
+  window.addEventListener('popstate', function () {
+    if (location.hash === '#seat') openInfo(null, false); else closeInfo(false);
+  });
+  if (location.hash === '#seat') { finishIntro(); openInfo(null, false); }
+})();
+
+/* ===== hand-drawn table sketch (draws, holds, erases, redraws) ===== */
+window.startSketch = function () {
+  if (window.startSketch.ran) return; window.startSketch.ran = true;
+  var NS = 'http://www.w3.org/2000/svg';
+  var W = 1210, CX = 605;
+  var clamp = function (x, a, b) { a = a === undefined ? 0 : a; b = b === undefined ? 1 : b; return Math.min(b, Math.max(a, x)); };
+  var ease = function (x) { return 0.5 - 0.5 * Math.cos(Math.PI * clamp(x)); };
+
+  function mulberry32(a) {
+    return function () {
+      a |= 0; a = a + 0x6D2B79F5 | 0;
+      var t = Math.imul(a ^ a >>> 15, 1 | a);
+      t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+      return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    };
+  }
+  var R = mulberry32(1);
+  function rnd(a, b) { return a + (b - a) * R(); }
+  function el(name, attrs, parent) {
+    var e = document.createElementNS(NS, name);
+    for (var k in attrs) e.setAttribute(k, attrs[k]);
+    if (parent) parent.appendChild(e);
+    return e;
+  }
+  function dist(a, b) { return Math.hypot(a[0] - b[0], a[1] - b[1]); }
+  function f1(n) { return n.toFixed(1); }
+
+  function mirrorPath(d) {
+    var i = 0;
+    return d.replace(/([MLQC])|(-?\d+(?:\.\d+)?)/g, function (m, c, n) {
+      if (c) { i = 0; return c; }
+      var v = parseFloat(n);
+      var out = (i % 2 === 0) ? (W - v) : v;
+      i++;
+      return out;
+    });
+  }
+  function parseStrokes(d) {
+    var tok = d.match(/[MLQ]|-?\d+(?:\.\d+)?/g), i = 0, cur = null, strokes = [], pos = null;
+    function dir(a, b) { return Math.atan2(b[1] - a[1], b[0] - a[0]); }
+    function add(pts) {
+      if (cur) {
+        var n = cur.length;
+        var a1 = dir(cur[n - 2], cur[n - 1]), a2 = dir(pts[0], pts[1]);
+        var da = Math.abs(Math.atan2(Math.sin(a2 - a1), Math.cos(a2 - a1)));
+        if (da < 0.7) { cur = cur.concat(pts.slice(1)); strokes[strokes.length - 1] = cur; return; }
+      }
+      cur = pts.slice(); strokes.push(cur);
+    }
+    while (i < tok.length) {
+      var c = tok[i++];
+      if (c === 'M') { pos = [+tok[i++], +tok[i++]]; cur = null; }
+      else if (c === 'L') { var p = [+tok[i++], +tok[i++]]; add([pos, p]); pos = p; }
+      else if (c === 'Q') {
+        var cp = [+tok[i++], +tok[i++]], p2 = [+tok[i++], +tok[i++]];
+        var pts = [pos];
+        for (var k = 1; k <= 10; k++) {
+          var u = k / 10, v = 1 - u;
+          pts.push([v * v * pos[0] + 2 * u * v * cp[0] + u * u * p2[0], v * v * pos[1] + 2 * u * v * cp[1] + u * u * p2[1]]);
+        }
+        add(pts); pos = p2;
+      }
+    }
+    return strokes;
+  }
+  function handPoints(pts, o) {
+    var cum = [0], L = 0, i;
+    for (i = 1; i < pts.length; i++) { L += dist(pts[i - 1], pts[i]); cum.push(L); }
+    function pointAt(s) {
+      var a, b, t;
+      if (s <= 0) { a = pts[0]; b = pts[1]; t = s / dist(a, b); }
+      else if (s >= L) { a = pts[pts.length - 2]; b = pts[pts.length - 1]; t = 1 + (s - L) / dist(a, b); }
+      else {
+        var j = 1; while (cum[j] < s) j++;
+        a = pts[j - 1]; b = pts[j]; t = (s - cum[j - 1]) / (cum[j] - cum[j - 1]);
+      }
+      return [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, b[0] - a[0], b[1] - a[1]];
+    }
+    var s0 = -(o.over0 || 0), s1 = L + (o.over1 || 0), span = s1 - s0;
+    var n = Math.max(2, Math.round(span / (o.step || 24)));
+    var w1 = rnd(130, 280), w2 = rnd(45, 95), p1 = rnd(0, 6.28), p2 = rnd(0, 6.28);
+    var amp = o.amp * Math.min(1, 0.35 + span / 160);
+    var out = [];
+    for (i = 0; i <= n; i++) {
+      var s = s0 + span * i / n;
+      var q = pointAt(s), tl = Math.hypot(q[2], q[3]) || 1;
+      var nx = -q[3] / tl, ny = q[2] / tl;
+      var off = amp * (0.65 * Math.sin(2 * Math.PI * s / w1 + p1) + 0.35 * Math.sin(2 * Math.PI * s / w2 + p2)) + (o.shift || 0) + rnd(-0.5, 0.5) * (o.jit || 1);
+      out.push([q[0] + nx * off, q[1] + ny * off]);
+    }
+    return out;
+  }
+  function smoothD(out) {
+    var d = 'M' + f1(out[0][0]) + ' ' + f1(out[0][1]);
+    for (var i = 1; i < out.length - 1; i++) {
+      var m = [(out[i][0] + out[i + 1][0]) / 2, (out[i][1] + out[i + 1][1]) / 2];
+      d += ' Q' + f1(out[i][0]) + ' ' + f1(out[i][1]) + ' ' + f1(m[0]) + ' ' + f1(m[1]);
+    }
+    var last = out[out.length - 1];
+    return d + ' L' + f1(last[0]) + ' ' + f1(last[1]);
+  }
+
+  var gMain = document.getElementById('main');
+  var gHatch = document.getElementById('hatch');
+  var gShadow = document.getElementById('shadow');
+  var noise = document.getElementById('noise');
+
+  var defsInk = [
+    { d: 'M 30 234 L 27 216 Q 27 207 38 207 L 1172 207 Q 1183 207 1183 216 L 1180 234', w: 3.2 },
+    { d: 'M 33 237 L 1177 237', w: 1.7 },
+    { d: 'M 33 234 L 52 266 L 136 281 L 147 298 L 232 314', m: true, w: 3.2 },
+    { d: 'M 232 314 Q 238 326 230 346 L 38 758 L 72 758 L 400 350', m: true, w: 3.2 },
+    { d: 'M 143 700 L 410 374 Q 428 350 462 349 L 748 349 Q 782 350 800 374 L 1067 700', w: 3 },
+    { d: 'M 143 700 L 170 700 L 214 647', m: true, w: 2.4 }
+  ];
+  var apron = [[30,209],[1180,209],[1180,234],[1158,266],[1074,281],[1063,298],[978,314],[800,374],[782,350],[748,349],[462,349],[428,350],[410,374],[232,314],[147,298],[136,281],[52,266],[33,234]];
+  var legL = [[232, 314], [38, 758], [72, 758], [400, 350], [410, 374]];
+  var regions = [
+    { pts: apron, ang: 38, sp: 9, flip: false, skip: 0.1 },
+    { pts: legL, ang: 30, sp: 10, flip: false, skip: 0.1 },
+    { pts: legL, ang: 30, sp: 10, flip: true, skip: 0.1 },
+    { pts: apron, ang: 118, sp: 21, flip: false, skip: 0.45 },
+    { pts: legL, ang: 78, sp: 22, flip: false, skip: 0.45 },
+    { pts: legL, ang: 78, sp: 22, flip: true, skip: 0.45 }
+  ];
+  function genHatch(region) {
+    var pts = region.pts.map(function (p) { return region.flip ? [W - p[0], p[1]] : p; });
+    var th = region.ang * Math.PI / 180;
+    var dir = region.flip ? [-Math.cos(th), -Math.sin(th)] : [Math.cos(th), -Math.sin(th)];
+    var nrm = [-dir[1], dir[0]];
+    var uv = pts.map(function (p) { return [p[0] * dir[0] + p[1] * dir[1], p[0] * nrm[0] + p[1] * nrm[1]]; });
+    var vmin = Infinity, vmax = -Infinity;
+    uv.forEach(function (q) { vmin = Math.min(vmin, q[1]); vmax = Math.max(vmax, q[1]); });
+    var out = [], prev = null, reverse = false;
+    for (var v = vmin + rnd(-4, 6); v < vmax + 4; v += region.sp * rnd(0.4, 1.9)) {
+      var xs = [];
+      for (var i = 0; i < uv.length; i++) {
+        var a = uv[i], b = uv[(i + 1) % uv.length];
+        if ((a[1] <= v) !== (b[1] <= v)) xs.push(a[0] + (v - a[1]) * (b[0] - a[0]) / (b[1] - a[1]));
+      }
+      xs.sort(function (x, y) { return x - y; });
+      for (var j = 0; j + 1 < xs.length; j += 2) {
+        var u0 = xs[j] + rnd(-16, 9), u1 = xs[j + 1] + rnd(-12, 18);
+        if (u1 - u0 < 8 || R() < region.skip) continue;
+        var dv = rnd(-8, 8);
+        var A = [dir[0] * u0 + nrm[0] * (v - dv), dir[1] * u0 + nrm[1] * (v - dv)];
+        var B = [dir[0] * u1 + nrm[0] * (v + dv), dir[1] * u1 + nrm[1] * (v + dv)];
+        var seg = reverse ? [B, A] : [A, B];
+        reverse = !reverse;
+        if (prev && R() < 0.55 && dist(prev[prev.length - 1], seg[0]) < 44) prev.push(seg[0], seg[1]);
+        else { prev = seg.slice(); out.push(prev); }
+      }
+    }
+    return out;
+  }
+
+  var strokes, hatch, shItems;
+  var D, HD = 2.4, HEND, FEND, EH, EEND, CYCLE, N;
+
+  function build(seed) {
+    R = mulberry32(seed);
+    gMain.textContent = ''; gHatch.textContent = ''; gShadow.textContent = '';
+    strokes = []; hatch = []; shItems = [];
+    defsInk.forEach(function (def) {
+      var variants = [def.d];
+      if (def.m) variants.push(mirrorPath(def.d));
+      variants.forEach(function (d) {
+        parseStrokes(d).forEach(function (pts) {
+          var passes = [];
+          function pass(opts, width, op, lag) {
+            var p = el('path', { d: smoothD(handPoints(pts, opts)), 'stroke-width': width.toFixed(2), opacity: op.toFixed(2) }, gMain);
+            passes.push({ el: p, len: p.getTotalLength(), lag: lag });
+          }
+          pass({ amp: rnd(1.4, 3.2), over0: rnd(0, 14), over1: rnd(3, 18), jit: 1.2 }, def.w * rnd(0.55, 1.05), rnd(0.8, 1), 0);
+          pass({ amp: rnd(1.8, 3.8), over0: rnd(-4, 9), over1: rnd(-4, 14), shift: rnd(-3.5, 3.5), jit: 1.5 }, rnd(0.9, 1.7), rnd(0.4, 0.7), 0.1);
+          if (R() < 0.6) pass({ amp: rnd(2, 4), over0: rnd(-3, 10), over1: rnd(0, 16), shift: rnd(-5, 5), jit: 1.8 }, rnd(0.7, 1.3), rnd(0.3, 0.5), 0.22);
+          strokes.push({ passes: passes, len: passes[0].len });
+        });
+      });
+    });
+    regions.forEach(function (r) {
+      genHatch(r).forEach(function (pts) {
+        var p = el('path', { d: smoothD(handPoints(pts, { amp: rnd(0.8, 2.2), step: 16, jit: 1.6 })), 'stroke-width': rnd(0.8, 2.3).toFixed(2), opacity: rnd(0.4, 0.95).toFixed(2) }, gHatch);
+        hatch.push({ el: p, len: p.getTotalLength() });
+      });
+    });
+    for (var j = 0; j < 7; j++) {
+      var half = 470 * Math.sqrt(Math.max(0.05, 1 - Math.pow((j - 3) / 3.8, 2))) * rnd(0.85, 1);
+      var y = 785 + j * 3.6;
+      var a = [CX - half + rnd(-20, 20), y + rnd(-1.5, 1.5)], b = [CX + half + rnd(-20, 20), y + rnd(-1.5, 1.5)];
+      var sp = el('path', { d: smoothD(handPoints([a, b], { amp: 2.2, step: 36, jit: 1.4 })), 'stroke-width': rnd(1, 2).toFixed(2), opacity: rnd(0.35, 0.8).toFixed(2) }, gShadow);
+      shItems.push({ el: sp, len: sp.getTotalLength() });
+    }
+    var cur = 0.6, i;
+    strokes.forEach(function (s) {
+      var dur = clamp(s.len / 2600, 0.1, 0.6);
+      s.s = cur; s.e = cur + dur; cur = s.e + 0.04;
+    });
+    D = cur + 0.2;
+    HEND = D + HD + 0.4;
+    FEND = HEND + 3.6;
+    EH = FEND;
+    cur = EH + 1.0;
+    for (i = strokes.length - 1; i >= 0; i--) {
+      var ed = clamp(strokes[i].len / 6500, 0.06, 0.25);
+      strokes[i].es = cur; strokes[i].ed = ed; cur += ed + 0.01;
+    }
+    EEND = cur + 0.4;
+    CYCLE = EEND + 0.9;
+    N = hatch.length;
+  }
+  function setProg(node, len, p) {
+    if (p <= 0.001) { node.style.display = 'none'; return; }
+    node.style.display = '';
+    node.style.strokeDasharray = len;
+    node.style.strokeDashoffset = len * (1 - p);
+  }
+  function itemProg(s, t) {
+    if (s.es !== undefined && t >= s.es) return 1 - ease((t - s.es) / s.ed);
+    if (t < s.s) return 0;
+    return ease((t - s.s) / (s.e - s.s));
+  }
+  function render(t) {
+    strokes.forEach(function (s) {
+      s.passes.forEach(function (ps) { setProg(ps.el, ps.len, itemProg(s, t - ps.lag)); });
+    });
+    for (var k = 0; k < N; k++) {
+      var h = hatch[k], p;
+      if (t >= EH) p = 1 - ease((t - (EH + ((N - 1 - k) / N) * 0.8)) / 0.2);
+      else p = ease((t - (D + (k / N) * HD)) / 0.32);
+      setProg(h.el, h.len, p);
+    }
+    shItems.forEach(function (s, j) {
+      var p = (t >= EH) ? 1 - ease((t - (EH + 0.1 + j * 0.07)) / 0.3) : ease((t - (D + 0.3 + j * 0.15)) / 0.6);
+      setProg(s.el, s.len, p);
+    });
+  }
+
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var seedBase = 11;
+  build(seedBase);
+  if (reduce) { render(HEND); return; }
+
+  var cycleStart = performance.now(), lastSeed = 0, seed = 3, cycleNo = 0;
+  function frame(now) {
+    var t = (now - cycleStart) / 1000;
+    if (t >= CYCLE) {
+      cycleNo++;
+      build(seedBase + cycleNo * 7);
+      cycleStart = now; t = 0;
+    }
+    if ((t < HEND || t > FEND) && now - lastSeed > 130) {
+      seed = (seed % 7) + 1;
+      noise.setAttribute('seed', seed);
+      lastSeed = now;
+    }
+    render(t);
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+};
+</script>
+</body>
+</html>
