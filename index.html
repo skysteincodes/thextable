@@ -173,6 +173,63 @@
     margin-top: 72px; font-size: clamp(14px, 1.2vw, 17px); letter-spacing: .02em; opacity: .7;
   }
 
+  /* ---------- forms sheet ---------- */
+  #sheet {
+    position: fixed; inset: 0; z-index: 40;
+    background: #000; color: #fff;
+    overflow-y: auto; -webkit-overflow-scrolling: touch;
+    opacity: 0; visibility: hidden; transform: translateY(24px);
+    transition: opacity .45s ease, transform .6s var(--ease-out), visibility 0s linear .6s;
+  }
+  #sheet.open { opacity: 1; visibility: visible; transform: none; transition: opacity .45s ease, transform .6s var(--ease-out), visibility 0s; }
+  .sheet-close {
+    position: fixed; top: 14px; right: 18px; z-index: 2;
+    font-size: 40px; line-height: 1; font-weight: 400; color: #fff; padding: 6px 10px; opacity: .8;
+  }
+  .sheet-close:hover { opacity: 1; }
+  .xform { max-width: 640px; margin: 0 auto; padding: 96px 20px 80px; text-align: left; }
+  .xform h2 {
+    font-size: clamp(26px, 4vw, 44px); line-height: 1.05; letter-spacing: -0.035em;
+    margin: 0 0 40px; font-weight: 700;
+  }
+  .xform .f { margin: 0 0 28px; border: 0; padding: 0; min-width: 0; }
+  .xform label, .xform legend {
+    display: block; font-size: 14px; letter-spacing: -0.005em; color: rgba(255,255,255,.62);
+    margin-bottom: 8px; padding: 0; font-weight: 700;
+  }
+  .xform input:not([type=radio]):not([type=checkbox]), .xform textarea {
+    width: 100%; display: block;
+    background: transparent; color: #fff; caret-color: #fff;
+    border: 0; border-bottom: 2px solid rgba(255,255,255,.28); border-radius: 0;
+    padding: 8px 0 10px; font: inherit; font-size: 20px; letter-spacing: -0.01em;
+    outline: none; resize: vertical; transition: border-color .2s ease;
+    -webkit-appearance: none; appearance: none;
+  }
+  .xform input::placeholder, .xform textarea::placeholder { color: rgba(255,255,255,.3); }
+  .xform input:focus, .xform textarea:focus { border-bottom-color: #fff; }
+  .xform.tried input:invalid, .xform.tried textarea:invalid { border-bottom-color: #ff6b5a; }
+  .xform input:-webkit-autofill { -webkit-text-fill-color: #fff; -webkit-box-shadow: 0 0 0 1000px #000 inset; }
+  .chips { display: flex; flex-wrap: wrap; gap: 10px; }
+  .chip { position: relative; margin: 0 !important; color: #fff !important; cursor: pointer; }
+  .chip input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
+  .chip span {
+    display: inline-block; border: 2px solid rgba(255,255,255,.45); border-radius: 999px;
+    padding: 10px 20px; font-size: 16px; color: #fff; transition: background .2s ease, color .2s ease, border-color .2s ease;
+  }
+  .chip input:checked + span { background: #fff; color: #000; border-color: #fff; }
+  .chip input:focus-visible + span { outline: 2px solid #fff; outline-offset: 3px; }
+  .xform.tried fieldset:has(input:invalid) .chip span { border-color: #ff6b5a; }
+  .plus { margin-top: 24px; }
+  .hp { position: absolute !important; left: -9999px !important; width: 1px; height: 1px; opacity: 0; }
+  .xform .submit { margin-top: 12px; background: #fff; color: #000; cursor: pointer; font-size: 17px; }
+  .xform .submit:hover, .xform .submit:focus-visible { background: transparent; color: #fff; }
+  .xform .submit:disabled { opacity: .6; cursor: default; }
+  .xform .status { min-height: 1em; margin: 16px 0 0; font-size: 15px; color: #ff8a7c; }
+  .xform .status a { color: #fff; }
+  .xform .foot { margin: 48px 0 0; font-size: 16px; opacity: .7; }
+  .xform .foot.big { font-size: clamp(20px, 2.4vw, 28px); opacity: .85; margin-top: 0; }
+  .xform.done { min-height: 70vh; display: flex; flex-direction: column; justify-content: center; }
+
   @media (max-width: 600px) {
     .btn { width: 100%; max-width: 340px; text-align: center; }
     #stage { padding-top: 64px; }
@@ -220,26 +277,78 @@
     <p class="lede">Every edition solves for a different<svg class="xmark" viewBox="120 200 615 410" role="img" aria-label="X"><path d="M152 505 C138 498 136 488 146 476 C210 400 300 315 385 250 C410 230 440 218 452 240 C462 262 440 310 410 390 C395 430 375 470 362 500 C356 518 368 524 392 522 L578 512"/><path d="M226 592 C330 500 450 410 560 335 C620 295 670 265 715 240"/></svg>.</p>
     <p class="seating"><b>next seating:</b>December 4th, Miami FL, Art Basel, 6pm</p>
     <div class="ctas">
-      <a class="btn" id="ticket" href="#">Request Ticket</a>
-      <a class="btn" id="partner" href="#">Partnerships &amp; Sponsor Request</a>
+      <a class="btn" href="#request" data-form="request">Request Ticket</a>
+      <a class="btn" href="#partner" data-form="partner">Partnerships &amp; Sponsor Request</a>
     </div>
     <div class="sign">[ Transmission &gt; Transaction ]</div>
   </div>
 </section>
 
+<!-- forms -->
+<section id="sheet" aria-hidden="true" role="dialog" aria-modal="true">
+  <button class="sheet-close" type="button" aria-label="Close">&times;</button>
+
+  <form class="xform" id="form-request" data-subject="Seat request: The X Table, Basel, 12.04" novalidate>
+    <h2>request a seat: the x table, basel. 12.04, miami.</h2>
+    <div class="f"><label for="r-name">name *</label><input id="r-name" name="name" required autocomplete="name"></div>
+    <div class="f"><label for="r-email">email *</label><input id="r-email" name="email" type="email" required autocomplete="email"></div>
+    <div class="f"><label for="r-phone">phone *</label><input id="r-phone" name="phone" type="tel" required autocomplete="tel"></div>
+    <div class="f"><label for="r-ig">instagram *</label><input id="r-ig" name="instagram" required placeholder="@" autocapitalize="off" autocorrect="off" spellcheck="false"></div>
+    <div class="f"><label for="r-build">what are you building? company, project, or practice. *</label><textarea id="r-build" name="building" rows="2" required></textarea></div>
+    <div class="f"><label for="r-x">what's your x? one line on what you'd bring to the table.</label><input id="r-x" name="your_x"></div>
+    <div class="f"><label for="r-allergy">allergies, please be specific. "none" is fine. *</label><input id="r-allergy" name="allergies" required></div>
+    <fieldset class="f">
+      <legend>bringing a plus one? *</legend>
+      <div class="chips">
+        <label class="chip"><input type="radio" name="plus_one" value="yes" required><span>yes</span></label>
+        <label class="chip"><input type="radio" name="plus_one" value="no"><span>no</span></label>
+      </div>
+      <div class="plus" hidden>
+        <div class="f"><label for="r-pname">their name *</label><input id="r-pname" name="plus_one_name"></div>
+        <div class="f"><label for="r-pemail">their email *</label><input id="r-pemail" name="plus_one_email" type="email"></div>
+      </div>
+    </fieldset>
+    <div class="f"><label for="r-heard">how did you hear about us?</label><input id="r-heard" name="heard_about_us"></div>
+    <input class="hp" type="text" name="_honey" tabindex="-1" autocomplete="off" aria-hidden="true">
+    <button class="btn submit" type="submit">request a seat</button>
+    <p class="status" role="status"></p>
+    <p class="foot">we'll be in touch. more to come.</p>
+  </form>
+
+  <form class="xform" id="form-partner" data-subject="Partnership / sponsor: The X Table" novalidate>
+    <h2>partnerships &amp; sponsors</h2>
+    <div class="f"><label for="p-name">name *</label><input id="p-name" name="name" required autocomplete="name"></div>
+    <div class="f"><label for="p-brand">brand *</label><input id="p-brand" name="brand" required autocomplete="organization"></div>
+    <div class="f"><label for="p-email">email *</label><input id="p-email" name="email" type="email" required autocomplete="email"></div>
+    <div class="f"><label for="p-web">website or instagram *</label><input id="p-web" name="website_or_instagram" required autocapitalize="off" autocorrect="off" spellcheck="false"></div>
+    <fieldset class="f" id="p-interest">
+      <legend>what do you have in mind? *</legend>
+      <div class="chips">
+        <label class="chip"><input type="checkbox" name="interest" value="product"><span>product</span></label>
+        <label class="chip"><input type="checkbox" name="interest" value="sponsorship"><span>sponsorship</span></label>
+        <label class="chip"><input type="checkbox" name="interest" value="activation"><span>activation</span></label>
+        <label class="chip"><input type="checkbox" name="interest" value="a seat"><span>a seat</span></label>
+        <label class="chip"><input type="checkbox" name="interest" value="other"><span>other</span></label>
+      </div>
+    </fieldset>
+    <div class="f"><label for="p-more">tell us more and how do our values resonate?</label><textarea id="p-more" name="tell_us_more" rows="4"></textarea></div>
+    <input class="hp" type="text" name="_honey" tabindex="-1" autocomplete="off" aria-hidden="true">
+    <button class="btn submit" type="submit">send</button>
+    <p class="status" role="status"></p>
+  </form>
+</section>
+
 <script>
 /* ===== edit these ===== */
-var EMAIL = 'skyler@holyduck.agency';
-var MAIL = {
-  ticket:  { subject: 'Ticket Request: The X Table, Miami, Dec 4', body: 'Name:\nCompany / project:\nWhat I bring to the table:\n' },
-  partner: { subject: 'Partnership & Sponsorship: The X Table', body: 'Name:\nCompany:\nWhat we have in mind:\n' }
+var EMAIL = 'skyler@holyduck.agency';   // fallback contact shown if a submission fails
+// where each form is delivered (via formsubmit.co); cc = extra inboxes that get a copy
+var DELIVER = {
+  request: { to: 'skyler@holyduck.agency', cc: ['lucy@thebasic-group.com'] },
+  partner: { to: 'skyler@holyduck.agency', cc: ['lucy@thebasic-group.com'] }
 };
 /* ====================== */
 
 (function () {
-  function mailto(o) { return 'mailto:' + EMAIL + '?subject=' + encodeURIComponent(o.subject) + '&body=' + encodeURIComponent(o.body); }
-  document.getElementById('ticket').href = mailto(MAIL.ticket);
-  document.getElementById('partner').href = mailto(MAIL.partner);
 
   var logo = document.getElementById('logo');
   var xm = logo.querySelector('.xmark');
@@ -349,14 +458,113 @@ var MAIL = {
   function canOpen() { return stage.classList.contains('on') && !info.classList.contains('open') && performance.now() - stageReadyAt > 400; }
   stage.addEventListener('click', function (e) { if (canOpen()) openInfo(e); });
   logo.addEventListener('click', function () { if (info.classList.contains('open')) closeInfo(); });
+  /* ---- forms ---- */
+  var sheet = document.getElementById('sheet');
+  var forms = { request: document.getElementById('form-request'), partner: document.getElementById('form-partner') };
+  var current = null;
+
+  function openForm(name, push) {
+    if (!forms[name]) return;
+    if (!info.classList.contains('open')) openInfo(null, false);
+    current = name;
+    forms.request.hidden = name !== 'request';
+    forms.partner.hidden = name !== 'partner';
+    sheet.scrollTop = 0;
+    sheet.classList.add('open');
+    sheet.removeAttribute('aria-hidden');
+    info.setAttribute('aria-hidden', 'true');
+    if (push !== false) history.pushState({ form: name }, '', '#' + name);
+    setTimeout(function () { var f = forms[name].querySelector('input'); if (f && window.innerWidth > 700) f.focus({ preventScroll: true }); }, 450);
+  }
+  function closeForm(push) {
+    if (!current) return;
+    current = null;
+    sheet.classList.remove('open');
+    sheet.setAttribute('aria-hidden', 'true');
+    info.removeAttribute('aria-hidden');
+    if (push !== false) {
+      if (history.state && history.state.form) history.back();
+      else history.replaceState(null, '', '#seat');
+    }
+  }
+  document.querySelectorAll('[data-form]').forEach(function (a) {
+    a.addEventListener('click', function (e) { e.preventDefault(); openForm(a.getAttribute('data-form')); });
+  });
+  sheet.querySelector('.sheet-close').addEventListener('click', function () { closeForm(); });
+
+  // plus one: reveal + require name/email only when "yes"
+  var plus = forms.request.querySelector('.plus');
+  forms.request.querySelectorAll('input[name=plus_one]').forEach(function (r) {
+    r.addEventListener('change', function () {
+      var yes = forms.request.querySelector('input[name=plus_one]:checked').value === 'yes';
+      plus.hidden = !yes;
+      plus.querySelectorAll('input').forEach(function (i) { i.required = yes; });
+    });
+  });
+
+  // partner: at least one interest must be picked
+  var interest = document.getElementById('p-interest');
+  function checkInterest() {
+    var any = interest.querySelector('input:checked');
+    interest.querySelector('input').setCustomValidity(any ? '' : 'pick at least one');
+    return !!any;
+  }
+  interest.addEventListener('change', checkInterest);
+
+  function submitForm(form) {
+    var status = form.querySelector('.status');
+    var btn = form.querySelector('.submit');
+    if (form === forms.partner) checkInterest();
+    form.classList.add('tried');
+    if (!form.checkValidity()) { form.reportValidity(); return; }
+    if (form.querySelector('.hp').value) return;           // bot filled the honeypot
+
+    var data = {}, fd = new FormData(form);
+    fd.forEach(function (v, k) {
+      if (k === '_honey') return;
+      if (!String(v).trim()) return;
+      data[k] = data[k] ? data[k] + ', ' + v : v;
+    });
+    if (data.plus_one === 'no') { delete data.plus_one_name; delete data.plus_one_email; }
+    data._subject = form.getAttribute('data-subject') + ' (' + (data.name || '') + ')';
+    data._template = 'table';
+    data._replyto = data.email;
+    var dest = DELIVER[form === forms.request ? 'request' : 'partner'];
+    if (dest.cc && dest.cc.length) data._cc = dest.cc.join(',');
+
+    btn.disabled = true; btn.textContent = 'sending…'; status.textContent = '';
+    fetch('https://formsubmit.co/ajax/' + dest.to, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(data)
+    }).then(function (r) { return r.json(); }).then(function (res) {
+      if (String(res.success) !== 'true') throw new Error(res.message || 'failed');
+      form.classList.add('done');
+      form.innerHTML = '<h2>' + (form === forms.request ? 'received.' : 'thank you.') + '</h2><p class="foot big">we\'ll be in touch. more to come.</p>';
+    }).catch(function () {
+      btn.disabled = false; btn.textContent = form === forms.request ? 'request a seat' : 'send';
+      status.innerHTML = 'something went wrong. try again, or email <a href="mailto:' + EMAIL + '">' + EMAIL + '</a>.';
+    });
+  }
+  Object.keys(forms).forEach(function (k) {
+    forms[k].addEventListener('submit', function (e) { e.preventDefault(); submitForm(forms[k]); });
+  });
+
+  /* ---- keys + back button ---- */
   window.addEventListener('keydown', function (e) {
-    if (e.key === 'Escape' && info.classList.contains('open')) closeInfo();
+    if (e.key === 'Escape' && current) closeForm();
+    else if (e.key === 'Escape' && info.classList.contains('open')) closeInfo();
     else if ((e.key === 'Enter' || e.key === ' ') && e.target === document.body && canOpen()) { e.preventDefault(); openInfo(null); }
   });
-  window.addEventListener('popstate', function () {
-    if (location.hash === '#seat') openInfo(null, false); else closeInfo(false);
-  });
-  if (location.hash === '#seat') { finishIntro(); openInfo(null, false); }
+  function route() {
+    var h = location.hash.slice(1);
+    if (forms[h]) openForm(h, false);
+    else if (h === 'seat') { closeForm(false); if (!info.classList.contains('open')) openInfo(null, false); }
+    else { closeForm(false); closeInfo(false); }
+  }
+  window.addEventListener('popstate', route);
+  var h0 = location.hash.slice(1);
+  if (h0 === 'seat' || forms[h0]) { finishIntro(); route(); }
 })();
 
 /* ===== hand-drawn table sketch (draws, holds, erases, redraws) ===== */
