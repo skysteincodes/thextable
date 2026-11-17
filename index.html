@@ -3,11 +3,52 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>The X Table</title>
-<meta name="description" content="The X Table is a recurring dinner series where high-signal founders and creators exchange lived intelligence.">
-<meta property="og:title" content="The X Table">
-<meta property="og:description" content="What do you bring to the table?">
+<title>The X Table | Founder &amp; Creator Dinner, Art Basel Miami 2026</title>
+<meta name="description" content="The X Table is a recurring dinner series where high-signal founders and creators exchange lived intelligence. Next seating: December 4, 2026, 6pm, Miami, during Art Basel Miami Beach week. Request a ticket.">
+<link rel="canonical" href="https://thextable.com/">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://thextable.com/">
+<meta property="og:site_name" content="The X Table">
+<meta property="og:title" content="The X Table | Art Basel Miami Dinner, Dec 4">
+<meta property="og:description" content="What do you bring to the table? A dinner for high-signal founders and creators during Miami Art Week. December 4, 2026, 6pm.">
+<meta property="og:locale" content="en_US">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="The X Table | Art Basel Miami Dinner, Dec 4">
+<meta name="twitter:description" content="What do you bring to the table? A dinner for high-signal founders and creators during Miami Art Week.">
+<meta name="twitter:image" content="https://thextable.com/favicon-512.png">
 <meta name="theme-color" content="#f6f4ef">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://thextable.com/#org",
+      "name": "The X Table",
+      "url": "https://thextable.com/",
+      "logo": "https://thextable.com/favicon-512.png",
+      "description": "A recurring dinner series where high-signal founders and creators exchange lived intelligence."
+    },
+    {
+      "@type": "Event",
+      "name": "The X Table: Miami Art Week Dinner",
+      "description": "A seated dinner for high-signal founders and creators during Art Basel Miami Beach week. Every edition solves for a different X.",
+      "startDate": "2026-12-04T18:00:00-05:00",
+      "eventStatus": "https://schema.org/EventScheduled",
+      "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
+      "location": {
+        "@type": "Place",
+        "name": "Miami, FL",
+        "address": { "@type": "PostalAddress", "addressLocality": "Miami", "addressRegion": "FL", "addressCountry": "US" }
+      },
+      "image": ["https://thextable.com/favicon-512.png"],
+      "organizer": { "@id": "https://thextable.com/#org" },
+      "url": "https://thextable.com/"
+    }
+  ]
+}
+</script>
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
 <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48.png">
 <link rel="icon" type="image/png" sizes="512x512" href="/favicon-512.png">
@@ -32,6 +73,7 @@
     overflow: hidden;
     -webkit-font-smoothing: antialiased;
   }
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
   button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
 
   /* ---------- the X mark ---------- */
@@ -71,7 +113,7 @@
     opacity: 0; pointer-events: none;
     transition: opacity .8s ease;
   }
-  #stage.on { opacity: 1; pointer-events: auto; }
+  #stage.on { opacity: 1; pointer-events: auto; cursor: pointer; }
   #ask {
     position: relative; z-index: 2;
     font-size: clamp(30px, 5.6vw, 76px); line-height: 1.02; letter-spacing: -0.04em;
@@ -141,6 +183,7 @@
 </style>
 </head>
 <body>
+<h1 class="sr-only">The X Table: a founder and creator dinner in Miami during Art Basel Miami Beach, December 4, 2026</h1>
 
 <!-- logo: one element that animates through all three phases -->
 <div id="logo" role="img" aria-label="the X table">
@@ -245,7 +288,9 @@ var MAIL = {
     logo.classList.add('is-link');
     showStage();
   }
+  var stageReadyAt = Infinity;
   function showStage() {
+    stageReadyAt = performance.now();
     stage.classList.add('on');
     stage.removeAttribute('aria-hidden');
     if (window.startSketch) window.startSketch();
@@ -299,9 +344,15 @@ var MAIL = {
     document.querySelector('meta[name=theme-color]').content = '#f6f4ef';
     if (push !== false && location.hash === '#seat') history.back();
   }
-  ask.addEventListener('click', function (e) { openInfo(e); });
+  // once the table page is up, a click or tap anywhere on it opens the next page
+  // (the short guard stops the tap that skipped the intro from also opening it)
+  function canOpen() { return stage.classList.contains('on') && !info.classList.contains('open') && performance.now() - stageReadyAt > 400; }
+  stage.addEventListener('click', function (e) { if (canOpen()) openInfo(e); });
   logo.addEventListener('click', function () { if (info.classList.contains('open')) closeInfo(); });
-  window.addEventListener('keydown', function (e) { if (e.key === 'Escape' && info.classList.contains('open')) closeInfo(); });
+  window.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && info.classList.contains('open')) closeInfo();
+    else if ((e.key === 'Enter' || e.key === ' ') && e.target === document.body && canOpen()) { e.preventDefault(); openInfo(null); }
+  });
   window.addEventListener('popstate', function () {
     if (location.hash === '#seat') openInfo(null, false); else closeInfo(false);
   });
