@@ -185,7 +185,8 @@
   #sheet.open { opacity: 1; visibility: visible; transform: none; transition: opacity .45s ease, transform .6s var(--ease-out), visibility 0s; }
   .sheet-close {
     position: fixed; top: 14px; right: 18px; z-index: 2;
-    font-size: 40px; line-height: 1; font-weight: 400; color: #fff; padding: 6px 10px; opacity: .8;
+    font-size: 40px; line-height: 1; font-weight: 400; color: #fff; padding: 2px 10px 6px; opacity: .85;
+    background: #000; border-radius: 999px; box-shadow: 0 0 0 6px #000;
   }
   .sheet-close:hover { opacity: 1; }
   .xform { max-width: 640px; margin: 0 auto; padding: 96px 20px 80px; text-align: left; }
@@ -232,8 +233,9 @@
   .xform.done { min-height: 70vh; display: flex; flex-direction: column; justify-content: center; }
 
   /* what to expect */
+  .info-links { margin: 2.2em 0 0; display: flex; gap: 28px; justify-content: center; flex-wrap: wrap; }
   .expect-link {
-    display: inline-block; margin-top: 2.2em; color: #fff; text-decoration: none;
+    display: inline-block; color: #fff; text-decoration: none;
     font-size: clamp(15px, 1.45vw, 20px); letter-spacing: -0.01em;
     border-bottom: 2px solid rgba(255,255,255,.4); padding-bottom: 2px;
     transition: border-color .2s ease;
@@ -247,6 +249,30 @@
   .expect section p { margin: 0; font-size: clamp(19px, 2vw, 23px); line-height: 1.35; letter-spacing: -0.015em; }
   .expect .submit { display: inline-block; margin-top: 18px; text-decoration: none; }
   .expect .foot a { color: #fff; }
+
+  /* about: skyler X lucy */
+  .xform.about { max-width: 1120px; }
+  .about .duo {
+    display: flex; align-items: center; justify-content: center; gap: .3em;
+    font-size: clamp(40px, 7vw, 92px); letter-spacing: -0.045em; line-height: 1; margin: 0 0 64px;
+  }
+  .about .duo .xmark { height: 1.3em; margin: 0 .05em; }
+  .about-grid {
+    display: grid; grid-template-columns: 1fr minmax(220px, .8fr) 1fr; gap: 48px; align-items: start;
+  }
+  .about h3 { margin: 0 0 12px; font-size: 14px; color: rgba(255,255,255,.62); letter-spacing: -0.005em; font-weight: 700; }
+  .about .who p { margin: 0; font-size: clamp(17px, 1.45vw, 19px); line-height: 1.5; letter-spacing: -0.01em; }
+  .about .mid { text-align: center; padding-top: 4px; }
+  .about .mid h3 { font-size: 16px; }
+  .about .mid .xmark.big { height: 120px; display: block; margin: 0 auto 22px; }
+  .about .mid p { margin: 0; font-size: clamp(21px, 2vw, 26px); line-height: 1.3; letter-spacing: -0.025em; }
+  .about .mid h3 .xmark { height: 1.5em; vertical-align: -.5em; margin-left: .1em; color: #fff; }
+  .about .who.right { text-align: left; }
+  @media (max-width: 860px) {
+    .about-grid { grid-template-columns: 1fr; gap: 44px; }
+    .about .duo { margin-bottom: 44px; }
+    .about .mid .xmark.big { height: 84px; }
+  }
 
   @media (max-width: 600px) {
     .btn { width: 100%; max-width: 340px; text-align: center; }
@@ -293,7 +319,10 @@
   <div class="info-inner">
     <p class="lede">The X Table is a recurring dinner series where high-signal founders and creators exchange lived intelligence.</p>
     <p class="lede">Every edition solves for a different<svg class="xmark" viewBox="120 200 615 410" role="img" aria-label="X"><path d="M152 505 C138 498 136 488 146 476 C210 400 300 315 385 250 C410 230 440 218 452 240 C462 262 440 310 410 390 C395 430 375 470 362 500 C356 518 368 524 392 522 L578 512"/><path d="M226 592 C330 500 450 410 560 335 C620 295 670 265 715 240"/></svg>.</p>
-    <a class="expect-link" href="#expect" data-form="expect">what to expect <span aria-hidden="true">&rarr;</span></a>
+    <p class="info-links">
+      <a class="expect-link" href="#expect" data-form="expect">what to expect <span aria-hidden="true">&rarr;</span></a>
+      <a class="expect-link" href="#about" data-form="about">about <span aria-hidden="true">&rarr;</span></a>
+    </p>
     <p class="seating"><b>next seating:</b>December 4th, Miami FL, Art Basel, 6pm</p>
     <div class="ctas">
       <a class="btn" href="#request" data-form="request">Request Ticket</a>
@@ -306,6 +335,24 @@
 <!-- forms -->
 <section id="sheet" aria-hidden="true" role="dialog" aria-modal="true">
   <button class="sheet-close" type="button" aria-label="Close">&times;</button>
+
+  <div class="xform about" id="panel-about">
+    <h2 class="duo"><span>skyler</span><svg class="xmark" viewBox="120 200 615 410" role="img" aria-label="X"><path d="M152 505 C138 498 136 488 146 476 C210 400 300 315 385 250 C410 230 440 218 452 240 C462 262 440 310 410 390 C395 430 375 470 362 500 C356 518 368 524 392 522 L578 512"/><path d="M226 592 C330 500 450 410 560 335 C620 295 670 265 715 240"/></svg><span>lucy</span></h2>
+    <div class="about-grid">
+      <section class="who left">
+        <h3>skyler stein</h3>
+        <p>Skyler Stein brings people’s ideas to life. It started in experiential design, where the work is deciding how a moment feels before anyone arrives: who’s in the room, where they sit, what happens first. Over a decade as a creative strategist, consultant, and creative director, including through her agency Holyduck, she has built brands, campaigns, and stories from that same instinct. That through line is how she became the founder of Skydeas, a platform where creators protect, build, and sell their ideas. Underneath it all is a love of community: bringing bright minds together and making room for real conversation. She values human connection, and her passion has always been helping people create, so building a table for them is a natural path.</p>
+      </section>
+      <section class="mid">
+        <h3>their <svg class="xmark" viewBox="120 200 615 410" role="img" aria-label="X"><path d="M152 505 C138 498 136 488 146 476 C210 400 300 315 385 250 C410 230 440 218 452 240 C462 262 440 310 410 390 C395 430 375 470 362 500 C356 518 368 524 392 522 L578 512"/><path d="M226 592 C330 500 450 410 560 335 C620 295 670 265 715 240"/></svg></h3>
+        <p>Lucy builds the plate. Skyler builds the room. Two founders who lifted each other through their own process, now bringing that same feeling to a table of people. That’s the X Table.</p>
+      </section>
+      <section class="who right">
+        <h3>lucy mello</h3>
+        <p>Lucy Mello is a private chef based in Miami, redefining the basics of cooking. Self-taught by choice, she cooks without a rulebook and through her own lens, drawing on her Brazilian roots, a foundation in French technique, and a constant pull to push boundaries. Her food is designed to make you pause, look twice, and reconsider what you assumed was on the plate. At the heart of it is a simple belief: meaningful connections are built around a table. The food is just the excuse.</p>
+      </section>
+    </div>
+  </div>
 
   <div class="xform expect" id="panel-expect">
     <h2>what to expect</h2>
@@ -492,7 +539,7 @@ var NOTIFY = ['skyler@holyduck.agency', 'lucy@thebasic-group.com'];
   /* ---- forms ---- */
   var sheet = document.getElementById('sheet');
   var forms = { request: document.getElementById('form-request'), partner: document.getElementById('form-partner') };
-  var panels = { expect: document.getElementById('panel-expect'), request: forms.request, partner: forms.partner };
+  var panels = { expect: document.getElementById('panel-expect'), about: document.getElementById('panel-about'), request: forms.request, partner: forms.partner };
   var current = null;
 
   function openForm(name, push) {
