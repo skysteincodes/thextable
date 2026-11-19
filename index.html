@@ -268,6 +268,11 @@
   .about .mid p { margin: 0; font-size: clamp(21px, 2vw, 26px); line-height: 1.3; letter-spacing: -0.025em; }
   .about .mid h3 .xmark { height: 1.5em; vertical-align: -.5em; margin-left: .1em; color: #fff; }
   .about .who.right { text-align: left; }
+  .about .who p.socials { display: flex; flex-wrap: wrap; gap: 6px 18px; margin: -4px 0 16px; font-size: 15px; }
+  .about .socials a { color: #fff; text-decoration: none; border-bottom: 1.5px solid rgba(255,255,255,.35); padding-bottom: 1px; display: inline-flex; align-items: center; gap: 6px; transition: border-color .2s ease; }
+  .about .socials a:hover, .about .socials a:focus-visible { border-bottom-color: #fff; outline: none; }
+  .about .socials .ig { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2; }
+  .about .socials .ig .dot { fill: currentColor; stroke: none; }
   @media (max-width: 860px) {
     .about-grid { grid-template-columns: 1fr; gap: 44px; }
     .about .duo { margin-bottom: 44px; }
@@ -340,15 +345,17 @@
     <h2 class="duo"><span>skyler</span><svg class="xmark" viewBox="120 200 615 410" role="img" aria-label="X"><path d="M152 505 C138 498 136 488 146 476 C210 400 300 315 385 250 C410 230 440 218 452 240 C462 262 440 310 410 390 C395 430 375 470 362 500 C356 518 368 524 392 522 L578 512"/><path d="M226 592 C330 500 450 410 560 335 C620 295 670 265 715 240"/></svg><span>lucy</span></h2>
     <div class="about-grid">
       <section class="who left">
-        <h3>skyler stein</h3>
+        <h3>World Builder</h3>
+        <p class="socials"><a href="https://www.instagram.com/skystein/" target="_blank" rel="noopener"><svg class="ig" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.4" cy="6.6" r="1.1" class="dot"/></svg>@skystein</a><a href="https://www.skysteindesign.com" target="_blank" rel="noopener">www.skysteindesign.com</a></p>
         <p>Skyler Stein brings people’s ideas to life. It started in experiential design, where the work is deciding how a moment feels before anyone arrives: who’s in the room, where they sit, what happens first. Over a decade as a creative strategist, consultant, and creative director, including through her agency Holyduck, she has built brands, campaigns, and stories from that same instinct. That through line is how she became the founder of Skydeas, a platform where creators protect, build, and sell their ideas. Underneath it all is a love of community: bringing bright minds together and making room for real conversation. She values human connection, and her passion has always been helping people create, so building a table for them is a natural path.</p>
       </section>
       <section class="mid">
-        <h3>their <svg class="xmark" viewBox="120 200 615 410" role="img" aria-label="X"><path d="M152 505 C138 498 136 488 146 476 C210 400 300 315 385 250 C410 230 440 218 452 240 C462 262 440 310 410 390 C395 430 375 470 362 500 C356 518 368 524 392 522 L578 512"/><path d="M226 592 C330 500 450 410 560 335 C620 295 670 265 715 240"/></svg></h3>
+        <h3>their X</h3>
         <p>Lucy builds the plate. Skyler builds the room. Two founders who lifted each other through their own process, now bringing that same feeling to a table of people. That’s the X Table.</p>
       </section>
       <section class="who right">
-        <h3>lucy mello</h3>
+        <h3>Chef in Residence</h3>
+        <p class="socials"><a href="https://www.instagram.com/lucy.mellob/" target="_blank" rel="noopener"><svg class="ig" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.4" cy="6.6" r="1.1" class="dot"/></svg>@lucy.mellob</a><a href="https://www.cheflucymello.com" target="_blank" rel="noopener">www.cheflucymello.com</a></p>
         <p>Lucy Mello is a private chef based in Miami, redefining the basics of cooking. Self-taught by choice, she cooks without a rulebook and through her own lens, drawing on her Brazilian roots, a foundation in French technique, and a constant pull to push boundaries. Her food is designed to make you pause, look twice, and reconsider what you assumed was on the plate. At the heart of it is a simple belief: meaningful connections are built around a table. The food is just the excuse.</p>
       </section>
     </div>
